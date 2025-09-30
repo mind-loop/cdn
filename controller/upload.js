@@ -3,7 +3,7 @@ const fs = require("fs");
 const asyncHandler = require("../middleware/asyncHandle");
 const MyError = require("../utils/myError");
 const cuid = require("cuid");
-const { ensureDir } = require("../utils/common");
+const { ensureDir, cleanOldFolders } = require("../utils/common");
 /**
  * Universal file uploader
  *  - Supports type-based folders (e.g., image, docs)
@@ -68,5 +68,19 @@ exports.uploadFile = asyncHandler(async (req, res, next) => {
       size: file.size,
       url: publicUrl
     }
+  });
+});
+
+
+exports.cleanOldImages = asyncHandler(async (req, res, next) => {
+  const { type, year } = req.body;
+
+  if (!type) return res.status(400).json({ success: false, message: "type шаардлагатай" });
+
+  const deleted = await cleanOldFolders(type, Number(year));
+
+  res.status(200).json({
+    success: true,
+    message: `Дараах хавтаснууд устлаа: ${deleted.join(", ")}`,
   });
 });

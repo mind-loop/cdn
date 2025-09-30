@@ -10,3 +10,7 @@ Test the REST CRUD API.
 https://itwork.mn
 1. FILE SERVER
 2. EMAIL SERVER
+
+PLAN PACKAGE
+- QPAY
+- STOREPAY

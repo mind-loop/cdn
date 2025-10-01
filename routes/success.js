@@ -9,8 +9,15 @@ router.route("/").get((req, res) => {
         "1. File upload",
         "2. File management",
         "3. Email service",
-        "4. Coming soon...",
       ],
+      ideas: [
+        "User Login/Signup",
+        "Qpay integration",
+        "Link shortening",
+        "Mongolian citys weather",
+        "Mongolian sum and aimag info",
+        "Weather info"
+      ]
     },
     success: true,
   });

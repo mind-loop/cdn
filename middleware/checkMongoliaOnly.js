@@ -9,25 +9,15 @@ async function checkMongoliaOnly(req, res, next) {
     // Хэрэв local machine бол test хийхэд ашиглах IP зааж болно
     const targetIp = ip === "::1" ? "103.229.120.1" : ip; // Mongolia IP example
     // Гео мэдээлэл авах (ipapi)
-    await axios(`https://ipapi.co/${targetIp}/json/`).then((response)=>{
-    req.clientLocation = {
-      ip: targetIp,
-      country: response.data.country_name,
-      city: response.data.city
-    };
-
-    // Монгол биш бол блоклох
-    if (response.data.country_name !== "Mongolia") {
-      return res.status(403).json({
-        success: false,
-        error: "Only permission required Mongolia",
-        location: req.clientLocation
+    await axios(`https://ipapi.co/${targetIp}/json/`).then((response) => {
+      return res.status(400).json({
+        success: true,
+        location: response.data,
       });
-    }
     });
     // Хэрэглэгчийн байрлал хадгалах
     // Монгол бол цааш үргэлжлүүлнэ
-    next();
+
   } catch (err) {
     console.error("GeoIP Error:", err.message);
     return res.status(500).json({

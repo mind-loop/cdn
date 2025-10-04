@@ -10,6 +10,7 @@ const logger = require("./middleware/logger");
 // Router оруулж ирэх
 const uploadRoutes = require("./routes/upload")
 const emailRoutes = require("./routes/email")
+const companyRoutes = require("./routes/company")
 const checkerRoutes = require("./routes/checker")
 const successRoutes = require("./routes/success");
 const cors = require("cors");
@@ -46,6 +47,7 @@ app.use(cors());
 app.use(express.static("public"));
 app.use("/api/upload", uploadRoutes);
 app.use("/api/email", emailRoutes);
+app.use("/api/company", companyRoutes);
 app.use("/api/checker", checkerRoutes);
 app.use("/api/v1", successRoutes);
 app.use(errorHandler);

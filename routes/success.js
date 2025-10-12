@@ -10,13 +10,13 @@ router.route("/").get((req, res) => {
         "2. File management",
         "3. Email service",
         "4. Mongolian Company Registered",
+        "5. Mongolian sum and aimag info",
       ],
       ideas: [
         "User Login/Signup",
         "Qpay integration",
         "Link shortening",
         "Mongolian citys weather",
-        "Mongolian sum and aimag info",
         "Weather info"
       ]
     },

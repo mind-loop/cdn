@@ -12,6 +12,7 @@ const uploadRoutes = require("./routes/upload")
 const emailRoutes = require("./routes/email")
 const companyRoutes = require("./routes/company")
 const checkerRoutes = require("./routes/checker")
+const geoserviceRoutes = require("./routes/geo-service")
 const successRoutes = require("./routes/success");
 const cors = require("cors");
 // Аппын тохиргоог process.env рүү ачаалах
@@ -49,6 +50,7 @@ app.use("/api/upload", uploadRoutes);
 app.use("/api/email", emailRoutes);
 app.use("/api/company", companyRoutes);
 app.use("/api/checker", checkerRoutes);
+app.use("/api/geo-service", geoserviceRoutes);
 app.use("/api/v1", successRoutes);
 app.use(errorHandler);
 const server = app.listen(

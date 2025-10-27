@@ -1,31 +1,47 @@
-const { default: axios } = require("axios");
+const geoip = require("geoip-lite");
 
-// Монголд байгаа эсэхийг шалгах middleware
-async function checkMongoliaOnly(req, res, next) {
+function checkMongoliaOnly(req, res, next) {
   try {
-    // Клиентийн IP авна
-    const ip = req.headers["x-forwarded-for"] || req.connection.remoteAddress;
+    // Клиентийн IP хаягийг авна
+    let ip =
+      req.headers["x-forwarded-for"]?.split(",")[0] ||
+      req.connection.remoteAddress ||
+      req.socket?.remoteAddress;
 
-    // Хэрэв local machine бол test хийхэд ашиглах IP зааж болно
-    const targetIp = ip === "::1" ? "103.229.120.1" : ip; // Mongolia IP example
-    // Гео мэдээлэл авах (ipapi)
-    await axios(`https://ipapi.co/${targetIp}/json/`).then((response) => {
-      req.clientLocation = {
-        ip: targetIp,
-        country: response.data.country_name,
-        city: response.data.city
-      };
+    // localhost бол тест IP ашиглая
+    const targetIp = ip === "::1" || ip === "127.0.0.1" ? "103.229.120.1" : ip;
 
-      // Монгол биш бол блоклох
-      if (response.data.country_name !== "Mongolia") {
-        return res.status(403).json({
-          success: false,
-          error: "Only permission required Mongolia",
-          location: req.clientLocation
-        });
-      }
-    });
-    // Хэрэглэгчийн байрлал хадгалах
+    // IP мэдээлэл хайна
+    const geo = geoip.lookup(targetIp);
+
+    if (!geo) {
+      return res.status(500).json({
+        success: false,
+        error: "Байршлын мэдээлэл олдсонгүй",
+        ip: targetIp
+      });
+    }
+
+    // Улсын код шалгах
+    const isMongolia = geo.country === "MN";
+
+    // Хэрэглэгчийн мэдээллийг хадгална
+    req.clientLocation = {
+      ip: targetIp,
+      country: geo.country, // "MN"
+      region: geo.region, // аймаг/бүсийн код
+      city: geo.city || "Unknown"
+    };
+
+    // Хэрэв Монгол биш бол блоклох
+    if (!isMongolia) {
+      return res.status(403).json({
+        success: false,
+        error: "Монгол Улсын хэрэглэгчдэд л зөвшөөрөгдөнө",
+        location: req.clientLocation
+      });
+    }
+
     // Монгол бол цааш үргэлжлүүлнэ
     next();
   } catch (err) {

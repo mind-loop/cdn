@@ -1,17 +1,32 @@
 const geoip = require("geoip-lite");
 
+// Зөвшөөрөгдсөн IP жагсаалт (жишээ нь VPN эсвэл тест серверүүд)
+const correctIP = ["159.89.153.58", "103.229.120.1"];
+
 function checkMongoliaOnly(req, res, next) {
   try {
-    // Клиентийн IP хаягийг авна
+    // Клиентийн IP хаягийг авах
     let ip =
       req.headers["x-forwarded-for"]?.split(",")[0] ||
       req.connection.remoteAddress ||
       req.socket?.remoteAddress;
 
-    // localhost бол тест IP ашиглая
+    // IPv6 localhost бол тестийн IP ашиглая
     const targetIp = ip === "::1" || ip === "127.0.0.1" ? "103.229.120.1" : ip;
 
-    // IP мэдээлэл хайна
+    // Зөвшөөрөгдсөн IP жагсаалтад байгаа эсэхийг шалгах
+    if (correctIP.includes(targetIp)) {
+      console.log(`✅ Whitelisted IP (${targetIp}) - Allowed without Geo check`);
+      req.clientLocation = {
+        ip: targetIp,
+        country: "MN",
+        region: "N/A",
+        city: "Whitelist"
+      };
+      return next();
+    }
+
+    // GeoIP мэдээлэл авах
     const geo = geoip.lookup(targetIp);
 
     if (!geo) {
@@ -22,18 +37,17 @@ function checkMongoliaOnly(req, res, next) {
       });
     }
 
-    // Улсын код шалгах
     const isMongolia = geo.country === "MN";
 
-    // Хэрэглэгчийн мэдээллийг хадгална
+    // Хэрэглэгчийн мэдээлэл хадгалах
     req.clientLocation = {
       ip: targetIp,
-      country: geo.country, // "MN"
-      region: geo.region, // аймаг/бүсийн код
+      country: geo.country,
+      region: geo.region,
       city: geo.city || "Unknown"
     };
 
-    // Хэрэв Монгол биш бол блоклох
+    // Монгол биш бол блоклох
     if (!isMongolia) {
       return res.status(403).json({
         success: false,
@@ -42,7 +56,7 @@ function checkMongoliaOnly(req, res, next) {
       });
     }
 
-    // Монгол бол цааш үргэлжлүүлнэ
+    // Монгол бол үргэлжлүүлэх
     next();
   } catch (err) {
     console.error("GeoIP Error:", err.message);

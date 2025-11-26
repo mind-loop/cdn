@@ -4,7 +4,7 @@ router.route("/").get((req, res) => {
   res.status(200).json({
     message: {
       version: "v1.0.0",
-      message: "LAST UPDATE: Correct IPS",
+      message: "LAST UPDATE: CDN EMAIL CHANGE SMTP PORT TO 465",
       points: [
         "1. File upload",
         "2. File management",
@@ -13,6 +13,7 @@ router.route("/").get((req, res) => {
         "5. Mongolian sum and aimag info",
       ],
       ideas: [
+        "open-ai ask",
         "User Login/Signup",
         "Qpay integration",
         "Link shortening",

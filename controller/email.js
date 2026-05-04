@@ -19,8 +19,8 @@ exports.emailTXTsent = asyncHandler(async (req, res, next) => {
     from,
     message: fullText,
     isHtml: false,
-    smtp_username: process.env.SMTP_USERNAME,
-    smtp_password: process.env.SMTP_PASSWORD,
+    SMTP_USERNAME: process.env.SMTP_USERNAME,
+    SMTP_PASSWORD: process.env.SMTP_PASSWORD,
   });
 
   res.status(200).json({ success: true, message: "Имэйл амжилттай илгээгдлээ" });
@@ -48,8 +48,8 @@ exports.emailHTMLsent = asyncHandler(async (req, res, next) => {
     from,
     message: htmlMessage,
     isHtml: true,
-    smtp_username: process.env.SMTP_USERNAME,
-    smtp_password: process.env.SMTP_PASSWORD,
+    SMTP_USERNAME: process.env.SMTP_USERNAME,
+    SMTP_PASSWORD: process.env.SMTP_PASSWORD,
   });
 
   res.status(200).json({ success: true, message: "Загварчилсан имэйл амжилттай илгээгдлээ" });

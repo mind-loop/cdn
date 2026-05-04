@@ -3,7 +3,7 @@ const router = express.Router();
 router.route("/").get((req, res) => {
   res.status(200).json({
     message: {
-      version: "v1.0.2",
+      version: "v1.0.3",
       message: "LAST UPDATE: CDN EMAIL APP PASSWORD CHANGED",
       points: [
         "1. File upload",

@@ -1,28 +1,41 @@
 const nodemailer = require("nodemailer");
 
 const sendEmail = async (options) => {
-  if (!options.email || !/^[\w.-]+@[\w.-]+\.\w+$/.test(options.email) || options.email.split("@")[0].length < 4) {
+  // Илүү боловсронгуй Regex
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!options.email || !emailRegex.test(options.email)) {
     throw new Error("Зөв имэйл хаяг оруулна уу.");
   }
 
-  let transporter = nodemailer.createTransport({
-    service: "gmail", // эсвэл өөр SMTP
+  const transporter = nodemailer.createTransport({
+    service: "gmail", 
     auth: {
       user: options.smtp_username,
       pass: options.smtp_password,
     },
   });
 
+  // Хэрэв "from" байхгүй бол itwork LLC-ээс ирсэн мэт харагдуулна
+  const fromDisplay = options.from 
+    ? `${options.from} via itwork <${options.smtp_username}>` 
+    : `itwork LLC <${options.smtp_username}>`;
+
   const mailOptions = {
-    from: options.from ? `${options.from} <${options.smtp_username}>` : `Систем <${process.env.SPONSOR_EMAIL}>`,
+    from: fromDisplay,
     to: options.email,
     subject: options.subject,
-    ...(options.isHtml ? { html: options.message } : { text: options.message }),
+    // HTML имэйл дээр ч текст хувилбарыг (fallback) явуулах нь UX-д сайн
+    text: options.isHtml ? "Please use an HTML compatible email client." : options.message,
+    html: options.isHtml ? options.message : null,
   };
 
-  const info = await transporter.sendMail(mailOptions);
-  console.log("Email sent: ", info.response);
-  return info;
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    return info;
+  } catch (error) {
+    console.error("Mail Transporter Error:", error);
+    throw new Error("Имэйл сервертэй холбогдоход алдаа гарлаа.");
+  }
 };
 
 module.exports = sendEmail;

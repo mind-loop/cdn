@@ -1,7 +1,13 @@
 const geoip = require("geoip-lite");
 
 // Зөвшөөрөгдсөн IP жагсаалт (жишээ нь VPN эсвэл тест серверүүд)
-const correctIP = ["159.89.153.58", "103.229.120.1"];
+const correctIP = [
+  "159.89.153.58", 
+  "103.229.120.1", 
+  "127.0.0.1",      // IPv4 localhost
+  "::1",            // IPv6 localhost
+  "::ffff:127.0.0.1" // IPv4-mapped IPv6 localhost
+];
 
 function checkMongoliaOnly(req, res, next) {
   try {

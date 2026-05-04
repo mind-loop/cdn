@@ -2,36 +2,36 @@ const asyncHandler = require("../middleware/asyncHandle");
 const sendEmail = require("../utils/email");
 const MyError = require("../utils/myError");
 const { emailTemplate } = require("../utils/common");
-// Text email
+// Text email илгээх
 exports.emailTXTsent = asyncHandler(async (req, res, next) => {
   const { text, title, email, from } = req.body;
 
   if (!title || !text || !email || !from) {
-    throw new MyError("Алдаа гарлаа: бүх талбар заавал шаардлагатай", 400);
+    throw new MyError("Бүх талбарыг бөглөнө үү", 400);
   }
+
+  // Текст имэйл дээр Footer залгах
+  const fullText = `${text}\n\n---\nPowered by itwork LLC`;
 
   await sendEmail({
     subject: title,
     email,
     from,
-    message: text,
+    message: fullText,
     isHtml: false,
     smtp_username: process.env.SMTP_USERNAME,
     smtp_password: process.env.SMTP_PASSWORD,
   });
 
-  res.status(200).json({
-    message: "Email Text амжилттай илгээгдлээ",
-    body: { success: true }
-  });
+  res.status(200).json({ success: true, message: "Имэйл амжилттай илгээгдлээ" });
 });
 
-// HTML email
+// HTML email илгээх
 exports.emailHTMLsent = asyncHandler(async (req, res, next) => {
   const { title, label, email, from, buttonText, buttonUrl, greeting } = req.body;
 
   if (!title || !label || !email || !from) {
-    throw new MyError("Алдаа гарлаа: бүх талбар заавал шаардлагатай", 400);
+    throw new MyError("Бүх талбарыг бөглөнө үү", 400);
   }
 
   const htmlMessage = emailTemplate({
@@ -52,8 +52,5 @@ exports.emailHTMLsent = asyncHandler(async (req, res, next) => {
     smtp_password: process.env.SMTP_PASSWORD,
   });
 
-  res.status(200).json({
-    message: "Email HTML амжилттай илгээгдлээ",
-    body: { success: true }
-  });
+  res.status(200).json({ success: true, message: "Загварчилсан имэйл амжилттай илгээгдлээ" });
 });
